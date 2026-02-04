@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { getFocusableElementsIncludingSlot } from '../controller/getFocusableElementsIncludingSlot';
+import { getFocusableElementsIncludingSlot } from '../../controller/getFocusableElementsIncludingSlot';
 
 
 describe('getFocusableElementsIncludingSlot', () => {

@@ -1,7 +1,7 @@
 import cssContent from "./AccessibleModal.css?inline";
 import { initializeFocusTrap } from "../controller/initializeFocusTrap";
 
-class AccessibleModal extends HTMLElement {
+export class AccessibleModal extends HTMLElement {
   private prevFocused: HTMLElement | null = null;
   private isOpen = false;
 
@@ -116,7 +116,7 @@ class AccessibleModal extends HTMLElement {
       >
         <div id="modal-header">
           <div id="close-modal-section">
-            <button id="close-modal" aria-label="close modal" class="base-button">닫기</button>
+            <button test-id="close-modal" id="close-modal" aria-label="close modal" class="base-button">닫기</button>
           </div>
           <h2 id="modal-title">${modalTitleContents}</h2>
         </div>
