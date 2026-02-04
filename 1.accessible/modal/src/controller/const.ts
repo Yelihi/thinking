@@ -1,0 +1,1 @@
+export const focusableElementsRef = ['button', 'input', 'textarea', 'select', 'a', 'iframe', 'video', 'audio'];

@@ -5,24 +5,27 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style.css">
   <title>modal</title>
 </head>
 
 <body>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
+  <div class="main-container">
+    <h1>Accessible Modal</h1>
+    <accessible-modal button-text-contents="열기123" modal-title-contents="실험입니다">
+      <div class="contents">
+        <p>안녕하세요. 실험입니다.</p>
+        <input type="text" placeholder="input">
+        <textarea placeholder="textarea"></textarea>
+        <select>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+        <button>button</button>
+        <a href="#">a</a>
+      </div>
+    </accessible-modal>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
