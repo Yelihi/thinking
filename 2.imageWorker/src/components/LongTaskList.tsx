@@ -1,4 +1,4 @@
-import type { LongTaskSample } from '../utils/observLongTask'
+import type { LongTaskSample } from '../utils/observeLongTask'
 
 export interface LongTaskListProps {
   longTasks: LongTaskSample[]

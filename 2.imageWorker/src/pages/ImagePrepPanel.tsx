@@ -39,8 +39,8 @@ export function ImagePrepPanel() {
   }, [resultReset])
 
   return (
-    <section className="font-system-ui mx-auto my-12 max-w-860">
-      <div className="flex items-center justify-between">
+    <section className="font-system-ui mx-auto my-12 flex max-w-860 flex-col items-center justify-center gap-4">
+      <div className="flex flex-col items-center justify-center gap-4">
         <h2 className="my-0">Session 1 — Image preprocess (Worker-first)</h2>
         <BaseButton onClick={handleReset}>Reset</BaseButton>
       </div>

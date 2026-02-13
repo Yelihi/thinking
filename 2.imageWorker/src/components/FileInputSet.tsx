@@ -4,7 +4,7 @@ export interface FileInputProps {
 
 export const FileInputSet = ({ onFileChange }: FileInputProps) => {
   return (
-    <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-dashed border-gray-200 p-4">
+    <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-200 p-10">
       <input
         type="file"
         accept="image/*"
