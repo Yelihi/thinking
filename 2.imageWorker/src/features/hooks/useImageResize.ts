@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { processImage } from '../processImage'
+
 export interface ImageResizeResult {
   previewUrl: string
   originalSize: number
@@ -24,7 +26,7 @@ export const useImageResize = () => {
     setResizeProcessError('')
 
     try {
-      const resultFile = await processImage(file, maxDim, quality)
+      const resultFile = await processImage(file, { maxDim, quality })
 
       setResizeResult((prev) => {
         if (prev?.previewUrl) URL.revokeObjectURL(prev.previewUrl)
