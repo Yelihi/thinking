@@ -41,28 +41,54 @@
 
 import type { WorkerRequest, WorkerResponse } from './interface'
 
+function makeId(): string {
+  return `${Date.now()}_${Math.random().toString(16).slice(2)}`
+}
+
 export const createImageWorkerClient = () => {
   // ImageWorker 를 생성합니다.
   const worker = new Worker(new URL('./imageWorker.ts', import.meta.url), { type: 'module' })
 
   // 요청 ID 와 콜백 함수를 저장하는 맵을 생성합니다.
-  const pending = new Map<string, (res: WorkerResponse) => void>()
+  const pending = new Map<
+    string,
+    { resolve: (res: WorkerResponse) => void; reject: (err: unknown) => void }
+  >()
 
   worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
     const response = e.data
-    // 메인 스레드에서 요청 ID 를 가져와서 resolve 함수를 가져옵니다.
-    const mainThreadResolve = pending.get(response.id)
-    if (!mainThreadResolve) return
+    const p = pending.get(response.id)
+    if (!p) return
     pending.delete(response.id)
-    mainThreadResolve(response)
+
+    // 에러 응답은 reject로 처리
+    if (!response.ok) {
+      p.reject(new Error(response.error))
+      return
+    }
+
+    // 성공 응답은 resolve
+    p.resolve(response)
   }
 
   return {
     async run(req: WorkerRequest): Promise<WorkerResponse> {
-      return await new Promise((resolve) => {
-        pending.set(req.id, resolve)
-        worker.postMessage(req)
+      const id = req.id || makeId() // ID가 없으면 자동 생성
+
+      // File을 ArrayBuffer로 변환 (Transferable로 전송)
+      const fileBuffer = req.fileBuffer || (await req.file.arrayBuffer())
+
+      const promise = new Promise<WorkerResponse>((resolve, reject) => {
+        pending.set(id, { resolve, reject })
       })
+
+      // Transferable로 전송하여 메모리 복사 없이 전달
+      worker.postMessage(
+        { ...req, id, fileBuffer },
+        [fileBuffer], // Transferable: 메인 스레드에서 ArrayBuffer 소유권 이전
+      )
+
+      return await promise
     },
     terminate() {
       worker.terminate()

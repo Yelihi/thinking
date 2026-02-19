@@ -9,6 +9,7 @@
  */
 
 import { fitMaxDimension } from '../../utils/imageMath'
+import { encodeBlobToArrayBuffer } from '../../utils/encodeBlobToArrayBuffer'
 
 // interface
 import type { WorkerRequest, WorkerSuccess, WorkerError } from './interface'
@@ -23,7 +24,8 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
   const t0 = performance.now() // 시작 시간 기록
 
   try {
-    const bmp = await createImageBitmap(req.file) // 이미지를 비트맵으로 변환
+    const inBlob = new Blob([req.fileBuffer])
+    const bmp = await createImageBitmap(inBlob) // 이미지를 비트맵으로 변환
     // 이미지의 가로/세로 비율을 유지하면서, 최대 크기(maxDim)이내로 축소하는 함수
     const { width, height } = fitMaxDimension(bmp.width, bmp.height, req.maxDim)
 
@@ -33,12 +35,28 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
     if (!ctx) throw new Error('2d context not available (worker)')
 
     ctx.drawImage(bmp, 0, 0, width, height)
+    // close bitmap to release memory sooner (where supported)
+    bmp.close()
 
     // OffscreenCanvas에는 convertToBlob이 있음(지원 환경에서) - 미지원이면 아래 fallback에서 처리
-    let blob: Blob
+
     const anyCanvas: OffscreenCanvas = canvas as OffscreenCanvas
     if (typeof anyCanvas.convertToBlob === 'function') {
-      blob = await anyCanvas.convertToBlob({ type: 'image/jpeg', quality: req.quality })
+      const outBlob = await anyCanvas.convertToBlob({ type: 'image/webp', quality: req.quality })
+      const outBuffer = await encodeBlobToArrayBuffer(outBlob)
+      const ms = Math.round(performance.now() - t0)
+
+      const result: WorkerSuccess = {
+        id: req.id,
+        ok: true,
+        blob: outBlob,
+        outBuffer,
+        width,
+        height,
+        ms,
+      }
+
+      self.postMessage(result)
     } else {
       /**
        * 이 부분이 햇갈릴 수 있는데
@@ -48,15 +66,13 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
        */
       throw new Error('OffscreenCanvas.convertToBlob not supported')
     }
-
-    const t1 = performance.now()
-    const res: WorkerSuccess = { id: req.id, ok: true, blob, width, height, ms: t1 - t0 }
-    self.postMessage(res)
   } catch (err: unknown) {
+    const ms = Math.round(performance.now() - t0)
     const res: WorkerError = {
       id: req.id,
       ok: false,
       error: (err as Error)?.message ?? 'Worker 에서 오류가 발생했습니다.',
+      ms: ms,
     }
     self.postMessage(res)
   }

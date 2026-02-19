@@ -15,15 +15,17 @@ const client = createImageWorkerClient()
 export const processImage = async (
   file: File,
   opts?: { maxDim?: number; quality?: number },
+  createPreviewUrl?: (blob: Blob) => string, // 콜백 추가
 ): Promise<ProcessResult> => {
   if (!file.type.startsWith('image/')) throw new Error('이미지 파일만 지원합니다')
 
   const maxDim = opts?.maxDim ?? 1600
   const quality = opts?.quality ?? 0.85
+  const fileBuffer = await file.arrayBuffer()
 
   // worker 스레드 환경을 구축합니다.
   const id = crypto.randomUUID()
-  const res = await client.run({ id, file, maxDim, quality })
+  const res = await client.run({ id, file, fileBuffer, maxDim, quality })
 
   let blob: Blob
   let width: number
@@ -51,7 +53,8 @@ export const processImage = async (
   }
 
   // blob 을 이미지 url 로 변환
-  const previewUrl = URL.createObjectURL(blob)
+  // createPreviewUrl 콜백이 있으면 사용, 없으면 기본 동작
+  const previewUrl = createPreviewUrl ? createPreviewUrl(blob) : URL.createObjectURL(blob)
 
   // 처리된 이미지 결과를 반환합니다.
   return { processedBlob: blob, previewUrl, meta: { width, height, ms, used } }
