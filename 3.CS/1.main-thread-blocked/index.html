@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <title>메인 스레드 실험</title>
+    <style>
+        body {
+            font-family: system-ui;
+            padding: 1.6rem;
+        }
+
+        button {
+            padding: 1rem 1.4rem;
+            font-size: 1.6rem;
+            margin-right: 0.8rem;
+        }
+
+        #status {
+            margin-top: 1.2rem;
+            font-size: 1.4rem;
+        }
+
+        #box {
+            margin-top: 1.2rem;
+            width: 1.6rem;
+            height: 1.6rem;
+            background: #4f46e5;
+            border-radius: 0.4rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Main Thread Lab</h1>
+    <div>
+        <button id="sync">Run sync</button>
+        <button id="chunk">Run chunk</button>
+        <button id="worker">Run worker</button>
+    </div>
+    <div id="status">Idle</div>
+    <div id="box"></div>
+
+    <script type="module" src="./thread.js"></script>
+</body>
+
+</html>
