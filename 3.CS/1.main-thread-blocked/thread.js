@@ -51,7 +51,7 @@ function runChunk(done, iter = 1000000000, budgetMs = 12) {
         const start = performance.now();
 
         while (i < iter && (performance.now() - start) < budgetMs) {
-            x += i % 10;
+            // x += i % 10;
             i++;
         }
 
@@ -62,6 +62,42 @@ function runChunk(done, iter = 1000000000, budgetMs = 12) {
         }
     }
     requestAnimationFrame(step);
+}
+
+const big = new Uint8Array(50 * 1024 * 1024); // 50mb
+big.fill(7);
+
+const transferWorkerCode = `
+    self.onmessage = (e) => {
+        const { buf } = e.data;
+        const arr = new Uint8Array(buf);
+        let sum = 0;
+        for (let i = 0; i < arr.length; i += 4096) {
+            sum += arr[i]
+        }
+        self.postMessage({ sum });
+    }
+`;
+
+const transferWorker = new Worker(URL.createObjectURL(new Blob([transferWorkerCode], { type: "text/javascript" })));
+
+function sendCopy() {
+    const t0 = performance.now();
+    transferWorker.onmessage = (e) => {
+        console.log("[B] copy ms:", (performance.now() - t0).toFixed(1), "sum:", e.data.sum);
+    };
+    // 복사 발생 가능 (structured clone)
+    transferWorker.postMessage({ buf: big.buffer })
+}
+
+function sendTransfer() {
+    const t0 = performance.now();
+    const buf = big.buffer.slice(0); // 데모용 복제
+    transferWorker.onmessage = (e) => {
+        console.log("[B] transfer ms:", (performance.now() - t0).toFixed(1), "sum:", e.data.sum);
+    };
+    // 소유권 이전(transferable)
+    transferWorker.postMessage({ buf }, [buf]);
 }
 
 /**
