@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Main thread bottleneck</title>
+  <style>
+    body { font-family: system-ui; padding: 16px; }
+    button { padding: 10px 14px; font-size: 16px; }
+    #box { margin-top: 12px; width: 16px; height: 16px; background: #4f46e5; }
+  </style>
+</head>
+<body>
+  <h1>Main thread bottleneck demo</h1>
+  <button id="btn">Block main thread</button>
+  <div id="status"></div>
+  <div id="box"></div>
+
+  <script>
+    const statusEl = document.querySelector("#status");
+    const box = document.querySelector("#box");
+    let t = 0;
+
+    function animate() {
+      t++;
+      box.style.transform = `translateX(${t % 260}px)`;
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    function heavyWork() {
+      const t0 = performance.now();
+      let x = 0;
+      for (let i = 0; i < 80_000_000; i++) x += i % 10;
+      const t1 = performance.now();
+      return (t1 - t0).toFixed(1);
+    }
+
+    function heavyWorkChunked(done) {
+      const t0 = performance.now();
+      let i = 0, x = 0;
+      function chunk() {
+        const start = performance.now();
+        while (i < 80_000_000 && performance.now() - start < 12) {
+          x += i % 10;
+          i++;
+        }
+        if (i < 80_000_000) requestAnimationFrame(chunk);
+        else done((performance.now() - t0).toFixed(1));
+      }
+      requestAnimationFrame(chunk);
+    }
+
+    document.querySelector("#btn").addEventListener("click", () => {
+      // statusEl.textContent = "Running (sync)...";
+      // const ms = heavyWork();
+      // statusEl.textContent = `Done: ${ms}ms (sync)`;
+
+      // 비교용(위 3줄을 주석 처리하고 아래로 교체)
+       statusEl.textContent = "Running (chunked)...";
+       heavyWorkChunked((ms) => statusEl.textContent = `Done: ${ms}ms (chunked)`);
+    });
+  </script>
+</body>
+</html>
