@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Unit of Work Lab</title>
+    <style>
+        body {
+            font-family: system-ui;
+            padding: 16px;
+        }
+
+        button {
+            padding: 10px 14px;
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 420px;
+        }
+
+        #box {
+            margin-top: 12px;
+            width: 16px;
+            height: 16px;
+            background: #4f46e5;
+            border-radius: 4px;
+        }
+
+        #status {
+            margin-top: 12px;
+        }
+
+        pre {
+            background: #111;
+            color: #eee;
+            padding: 10px;
+            border-radius: 8px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Atomic DFS vs Interruptible Unit of Work</h1>
+
+    <div>
+        <input id="q" placeholder="Type here while running work..." />
+    </div>
+
+    <div style="margin-top:12px">
+        <button id="atomic">Run Atomic DFS</button>
+        <button id="interrupt">Run Interruptible DFS</button>
+    </div>
+
+    <div id="status">Idle</div>
+    <div id="box"></div>
+    <pre id="log"></pre>
+
+    <script type="module">
+        import { animateBox, doExpensiveMath, recordPerformanceTime, log } from "./utils.js";
+        import { buildTree } from "./tree.js";
+        import { runAtomicDfs } from "./runAtomic.js";
+        import { runInterruptibleDfs } from "./runInterruptible.js";
+
+        const statusEl = document.getElementById("status");
+        const logEl = document.getElementById("log");
+
+        let time = 0;
+        animateBox(document.getElementById("box"), time)();
+
+        const tree = buildTree({ depth: 7, branching: 7 })
+
+        document.getElementById("atomic").addEventListener("click", () => {
+            statusEl.textContent = "Atomic DFS running...";
+            const ms = recordPerformanceTime(() => runAtomicDfs(tree.root));
+            statusEl.textContent = `Atomic DFS done: ${ms}ms`;
+            log(logEl, `[A] atomic ms=${ms}`);
+        })
+
+        document.getElementById("interrupt").addEventListener("click", async () => {
+            statusEl.textContent = "Interruptible DFS running...";
+            const ms = await runInterruptibleDfs(tree.root, 30);
+            statusEl.textContent = `Interruptible DFS done: ${ms}ms`;
+            log(logEl, `[I] interruptible ms=${ms}`);
+        })
+
+    </script>
+</body>
