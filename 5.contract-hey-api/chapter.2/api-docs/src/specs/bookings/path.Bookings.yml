@@ -1,0 +1,49 @@
+get:
+  tags:
+    - Bookings
+  summary: Get all bookings
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    '200':
+      description: A paginated list of bookings
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/PaginatedResponse'
+              - type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+
+post:
+  tags:
+    - Bookings
+  summary: Create a booking
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/BookingCreate'
+  responses:
+    '201':
+      description: Booking created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Booking'

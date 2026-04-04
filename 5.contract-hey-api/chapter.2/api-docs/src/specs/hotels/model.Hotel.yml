@@ -1,0 +1,13 @@
+allOf:
+  - $ref: '#/components/schemas/HotelUpsert'
+  - type: object
+    required:
+      - id
+      - createdAt
+    properties:
+      id:
+        type: string
+        format: uuid
+      createdAt:
+        type: string
+        format: date-time

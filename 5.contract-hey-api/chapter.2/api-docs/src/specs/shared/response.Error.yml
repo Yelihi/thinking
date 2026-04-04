@@ -1,0 +1,9 @@
+type: object
+required:
+  - message
+properties:
+  message:
+    type: string
+  code:
+    type: string
+    nullable: true

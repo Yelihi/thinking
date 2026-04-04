@@ -1,0 +1,14 @@
+type: object
+required:
+  - name
+  - location
+  - status
+properties:
+  name:
+    type: string
+    minLength: 1
+  location:
+    type: string
+    description: Where on Mars this hotel sits
+  status:
+    $ref: '#/components/schemas/HotelStatus'

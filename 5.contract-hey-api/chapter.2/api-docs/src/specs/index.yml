@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: Mars Hotel Booking API
+  version: 1.0.0
+  description: Contract-first practice project for frontend-backend collaboration
+servers:
+  - url: http://localhost:5173
+    description: Local docs server
+
+tags:
+  - name: Auth
+  - name: Hotels
+  - name: Bookings
+
+components:
+  securitySchemes:
+    bearerAuth: !!import/single ./shared/security.bearerAuth.yml
+
+  schemas:
+    PaginatedResponse: !!import/single ./shared/model.PaginatedResponse.yml
+    ErrorResponse: !!import/single ./shared/response.Error.yml
+
+    LoginRequest: !!import/single ./auth/model.LoginRequest.yml
+    LoginResponse: !!import/single ./auth/model.LoginResponse.yml
+
+    HotelStatus: !!import/single ./hotels/enum.HotelStatus.yml
+    HotelUpsert: !!import/single ./hotels/model.HotelUpsert.yml
+    Hotel: !!import/single ./hotels/model.Hotel.yml
+
+    BookingStatus: !!import/single ./bookings/enum.BookingStatus.yml
+    BookingCreate: !!import/single ./bookings/model.BookingCreate.yml
+    Booking: !!import/single ./bookings/model.Booking.yml
+
+paths:
+  /auth/login: !!import/single ./auth/path.auth-login.yml
+  /hotels: !!import/single ./hotels/path.hotels.yml
+  /bookings: !!import/single ./bookings/path.bookings.yml

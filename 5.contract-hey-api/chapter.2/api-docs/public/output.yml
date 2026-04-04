@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: Mars Hotel Booking API
+  version: 1.0.0
+  description: Contract-first practice project for frontend-backend collaboration
+servers:
+  - url: http://localhost:5173
+    description: Local docs server
+tags:
+  - name: Auth
+  - name: Hotels
+  - name: Bookings
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    PaginatedResponse:
+      type: object
+      required:
+        - totalItems
+        - totalPages
+        - currentPage
+        - pageSize
+      properties:
+        totalItems:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 1
+        currentPage:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+          nullable: true
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+    LoginResponse:
+      type: object
+      required:
+        - accessToken
+        - user
+      properties:
+        accessToken:
+          type: string
+        user:
+          type: object
+          required:
+            - id
+            - email
+            - role
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+              format: email
+            role:
+              type: string
+              enum:
+                - admin
+                - manager
+                - guest
+    HotelStatus:
+      type: string
+      enum:
+        - active
+        - maintenance
+        - archive
+    HotelUpsert:
+      type: object
+      required:
+        - name
+        - location
+        - status
+      properties:
+        name:
+          type: string
+          minLength: 1
+        location:
+          type: string
+          description: Where on Mars this hotel sits
+        status:
+          $ref: "#/components/schemas/HotelStatus"
+    Hotel:
+      allOf:
+        - $ref: "#/components/schemas/HotelUpsert"
+        - type: object
+          required:
+            - id
+            - createdAt
+          properties:
+            id:
+              type: string
+              format: uuid
+            createdAt:
+              type: string
+              format: date-time
+    BookingStatus:
+      type: string
+      enum:
+        - pending
+        - confirmed
+        - canceled
+    BookingCreate:
+      type: object
+      required:
+        - hotelId
+        - guestName
+        - checkInDate
+        - checkOutDate
+      properties:
+        hotelId:
+          type: string
+          format: uuid
+        guestName:
+          type: string
+          minLength: 1
+        checkInDate:
+          type: string
+          format: date
+        checkOutDate:
+          type: string
+          format: date
+    Booking:
+      allOf:
+        - $ref: "#/components/schemas/BookingCreate"
+        - type: object
+          required:
+            - id
+            - status
+            - createdAt
+          properties:
+            id:
+              type: string
+              format: uuid
+            status:
+              $ref: "#/components/schemas/BookingStatus"
+            createdAt:
+              type: string
+              format: date-time
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              email: admin@mars-hotel.dev
+              password: passw0rd123
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /hotels:
+    get:
+      tags:
+        - Hotels
+      summary: Get all hotels
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: A paginated list of hotels
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginatedResponse"
+                  - type: object
+                    required:
+                      - items
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Hotel"
+    post:
+      tags:
+        - Hotels
+      summary: Create a new hotel
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HotelUpsert"
+      responses:
+        "201":
+          description: Hotel created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+  /bookings:
+    get:
+      tags:
+        - Bookings
+      summary: Get all bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: A paginated list of bookings
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginatedResponse"
+                  - type: object
+                    required:
+                      - items
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Booking"
+    post:
+      tags:
+        - Bookings
+      summary: Create a booking
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingCreate"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"

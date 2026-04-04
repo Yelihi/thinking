@@ -1,0 +1,16 @@
+allOf:
+  - $ref: '#/components/schemas/BookingCreate'
+  - type: object
+    required:
+      - id
+      - status
+      - createdAt
+    properties:
+      id:
+        type: string
+        format: uuid
+      status:
+        $ref: '#/components/schemas/BookingStatus'
+      createdAt:
+        type: string
+        format: date-time

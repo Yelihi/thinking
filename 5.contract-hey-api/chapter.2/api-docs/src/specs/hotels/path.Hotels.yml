@@ -1,0 +1,56 @@
+get:
+  tags:
+    - Hotels
+  summary: Get all hotels
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: page
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    - name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+  responses:
+    '200':
+      description: A paginated list of hotels
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/PaginatedResponse'
+              - type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Hotel'
+
+post:
+  tags:
+    - Hotels
+  summary: Create a new hotel
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/HotelUpsert'
+  responses:
+    '201':
+      description: Hotel created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Hotel'

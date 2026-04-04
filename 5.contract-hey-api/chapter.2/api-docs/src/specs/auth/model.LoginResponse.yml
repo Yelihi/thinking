@@ -1,0 +1,26 @@
+type: object
+required:
+  - accessToken
+  - user
+properties:
+  accessToken:
+    type: string
+  user:
+    type: object
+    required:
+      - id
+      - email
+      - role
+    properties:
+      id:
+        type: string
+        format: uuid
+      email:
+        type: string
+        format: email
+      role:
+        type: string
+        enum:
+          - admin
+          - manager
+          - guest

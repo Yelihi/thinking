@@ -1,0 +1,19 @@
+type: object
+required:
+  - hotelId
+  - guestName
+  - checkInDate
+  - checkOutDate
+properties:
+  hotelId:
+    type: string
+    format: uuid
+  guestName:
+    type: string
+    minLength: 1
+  checkInDate:
+    type: string
+    format: date
+  checkOutDate:
+    type: string
+    format: date
