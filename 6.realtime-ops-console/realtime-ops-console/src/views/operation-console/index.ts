@@ -1,0 +1,1 @@
+export { OperationConsole } from "@/views/operation-console/ui/View"
