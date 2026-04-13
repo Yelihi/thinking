@@ -17,13 +17,15 @@ const randomBetween = (min: number, max: number) =>
 
 @singleton()
 export class MockNodeStream implements NodeStreamRepository {
-    constructor(
-        @inject(NodeBehavior) private readonly nodeBehavior: NodeBehavior
-    ) { }
-
     private listeners = new Set<SnapshotListener>();
     private timer: number | null = null;
-    private nodes: NodeSnapshot[] = this.createInitialNodes();
+    private nodes: NodeSnapshot[];
+
+    constructor(
+        @inject(NodeBehavior) private readonly nodeBehavior: NodeBehavior
+    ) {
+        this.nodes = this.createInitialNodes();
+    }
 
     private createInitialNodes(): NodeSnapshot[] {
         return Array.from({ length: 12 }, (_, i) => {

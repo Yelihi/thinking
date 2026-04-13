@@ -1,1 +1,1 @@
-export { OperationConsole } from "@/views/operation-console/ui/View"
+export { OperationsConsolePage } from "@/views/operation-console/ui/OperationsConsolePage"

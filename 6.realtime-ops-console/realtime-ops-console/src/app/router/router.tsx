@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // route
-import { OperationConsole } from '@/views/operation-console'
+import { OperationsConsolePage } from '@/views/operation-console'
 
 const router = createBrowserRouter([
     {
@@ -10,7 +10,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/dashboard',
-        element: <OperationConsole />
+        element: <OperationsConsolePage />
     }
 ])
 
