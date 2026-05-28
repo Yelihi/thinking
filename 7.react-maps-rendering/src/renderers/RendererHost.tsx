@@ -3,14 +3,16 @@ import { CanvasRendererPlaceholder } from "./canvas/CanvasRendererPlaceholder";
 import { DomRendererPlaceholder } from "./dom/DomRendererPlaceholder";
 import { WebGLRendererPlaceholder } from "./webgl/WebGLRendererPlaceholder";
 
-export function RendererHost({ controls }: RendererHostProps) {
+export function RendererHost({ controls, viewport }: RendererHostProps) {
+  const rendererProps = { controls, viewport };
+
   if (controls.rendererMode === "canvas") {
-    return <CanvasRendererPlaceholder controls={controls} />;
+    return <CanvasRendererPlaceholder {...rendererProps} />;
   }
 
   if (controls.rendererMode === "webgl") {
-    return <WebGLRendererPlaceholder controls={controls} />;
+    return <WebGLRendererPlaceholder {...rendererProps} />;
   }
 
-  return <DomRendererPlaceholder controls={controls} />;
+  return <DomRendererPlaceholder {...rendererProps} />;
 }

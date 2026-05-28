@@ -18,7 +18,8 @@ body {
 }
 
 button,
-select {
+select,
+input {
   font: inherit;
 }
 
@@ -125,6 +126,13 @@ select {
   padding: 0 10px;
 }
 
+button {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
@@ -147,6 +155,8 @@ select {
 .map-grid {
   position: absolute;
   inset: 0;
+  transform-origin: center;
+  transition: transform 160ms ease;
   background:
     radial-gradient(circle at 28% 32%, rgba(234, 88, 12, 0.9) 0 4px, transparent 5px),
     radial-gradient(circle at 55% 42%, rgba(22, 163, 74, 0.9) 0 4px, transparent 5px),
@@ -211,6 +221,36 @@ select {
 
 .metrics-panel [data-tone="warning"] dd {
   color: #b45309;
+}
+
+.metrics-panel [data-tone="success"] dd {
+  color: #047857;
+}
+
+.viewport-controls {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.viewport-controls h2 {
+  margin: 0;
+}
+
+.viewport-controls button {
+  min-height: 36px;
+}
+
+.pan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+input[type="range"] {
+  width: 100%;
 }
 
 .manual-boundary ul {
