@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 import Select from '../components/Select';
 import { RendererHost } from "../renderers/RendererHost";
@@ -6,8 +6,12 @@ import { rendererModes, markerCounts, distributions, scaffoldMetrics } from "./c
 import type {
   BenchmarkControls,
   MarkerCountOption,
-
+  MarkerDistribution,
+  RendererMode,
 } from "./types";
+
+
+const formatMarkerCount = (count: number) => count.toLocaleString("ko-KR");
 
 
 export function BenchmarkPage() {
@@ -17,9 +21,21 @@ export function BenchmarkPage() {
     distribution: "uniform",
   })
 
-  const changeControls = (newControls: BenchmarkControls) => {
-    setControls(newControls);
-  }
+  const defaultMarkerCount = controls.markerCount;
+  const defaultDistribution = controls.distribution;
+
+  const handleMarkerCountChange = useCallback((newCount: MarkerCountOption) => {
+    setControls((prev) => ({ ...prev, markerCount: newCount }));
+  }, []);
+
+  const handleDistributionChange = useCallback((newDistribution: typeof distributions[number]) => {
+    setControls((prev) => ({ ...prev, distribution: newDistribution.value }));
+  }, []);
+
+  const changeRendererMode = useCallback((newMode: RendererMode) => {
+    setControls((prev) => ({ ...prev, rendererMode: newMode }));
+  }, []);
+
 
   return (
     <main className="app-shell">
@@ -37,7 +53,7 @@ export function BenchmarkPage() {
                   aria-pressed={renderer.mode === controls.rendererMode}
                   key={renderer.mode}
                   type="button"
-                  onClick={() => changeControls({ ...controls, rendererMode: renderer.mode })}
+                  onClick={() => changeRendererMode(renderer.mode)}
                 >
                   {renderer.label}
                 </button>
@@ -46,27 +62,16 @@ export function BenchmarkPage() {
           </fieldset>
           <label>
             Marker Count
-            <Select
-              defaultValue={controls.markerCount}
-              onChange={(e) => changeControls({ ...controls, markerCount: Number(e.target.value) as MarkerCountOption })}
+            <Select<MarkerCountOption>
+              defaultValue={defaultMarkerCount}
+              onChange={handleMarkerCountChange}
               options={markerCounts}
-            >
-              {(options) => options.map((count) => (
-                <option key={count} value={count}>
-                  {count.toLocaleString("ko-KR")}
-                </option>
-              ))}
-            </Select>
+              getOptionLabel={formatMarkerCount}
+            />
           </label>
           <label>
             Distribution
-            <Select defaultValue={controls.distribution} options={distributions}>
-              {(options) => options.map((distribution) => (
-                <option key={distribution.value} value={distribution.value}>
-                  {distribution.label}
-                </option>
-              ))}
-            </Select>
+            <Select<typeof distributions[number]> defaultValue={defaultDistribution} options={distributions} onChange={handleDistributionChange} />
           </label>
         </div>
       </section>
